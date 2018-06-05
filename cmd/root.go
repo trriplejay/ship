@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 John Stockbauer <stockbauer@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+const shippableAPIURL = "https://api.shippable.com"
 
 var cfgFile string
 
@@ -85,7 +87,8 @@ func initConfig() {
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".ship")
 	}
-
+	viper.SetDefault("apiToken", "")
+	viper.SetDefault("endpoint", shippableAPIURL)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
