@@ -27,22 +27,18 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/trriplejay/ship/shippable"
 )
-
-const shippableAPIURL = "https://api.shippable.com"
 
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "ship",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "CLI for shippable CI/CD",
+	Long: `A CLI that allows simple interaction with 
+Shippable objects, including the triggering jobs, 
+updating resource versions, and checking status`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -88,7 +84,7 @@ func initConfig() {
 		viper.SetConfigName(".ship")
 	}
 	viper.SetDefault("apiToken", "")
-	viper.SetDefault("endpoint", shippableAPIURL)
+	viper.SetDefault("endpoint", shippable.DefaultURL)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

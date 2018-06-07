@@ -1,4 +1,4 @@
-// Copyright © 2018 JOHN STOCKBAUER STOCKBAUER@GMAIL.COM
+// Copyright © 2018 John Stockbauer <stockbauer@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

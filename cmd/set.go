@@ -35,6 +35,9 @@ authentication with the shippable api.
 These values by default are stored in $HOME/.ship.yaml`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("set called")
+		flags := cmd.Flags()
+
+		fmt.Printf("default url: %s", flags.Lookup("token"))
 	},
 }
 
