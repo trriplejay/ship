@@ -17,13 +17,25 @@ type Client struct {
 	httpClient *http.Client
 }
 
-// Subscription is a fundamental object in shippable
-// it contains the organization name, a unique ID,
+// Subscription is an object that represents an organization
+// It contains the organization name, a unique ID,
 // and the total minion count
 type Subscription struct {
-	OrgName     string `json:"orgName"`
 	ID          string `json:"id"`
+	OrgName     string `json:"orgName"`
 	MinionCount int    `json:"minionCount"`
+}
+
+// Project is an object that represents a repository on shippable
+type Project struct {
+	ID                  string `json:"id"`
+	FullName            string `json:"fullName"`
+	Name                string `json:"name"`
+	SubscriptionID      string `json:"subscriptionId"`
+	BuilderAccountID    string `json:"builderAccountId"`
+	RepositoryURL       string `json:"repositoryUrl"`
+	SourceDefaultBranch string `json:"sourceDefaultBranch"`
+	IsPrivateRepository bool   `json:"isPrivateRepository"`
 }
 
 // NewClient is a constructor for the shippable package
@@ -61,11 +73,11 @@ func NewClient(host string, token string) (*Client, error) {
 // 		return
 // 	}
 // 	fmt.Printf("%+v\n", subs)
-func (c *Client) ListSubscriptions(q string) ([]Subscription, error) {
+func (c *Client) ListSubscriptions(query string) ([]Subscription, error) {
 
 	rel := &url.URL{Path: "/subscriptions"}
 	u := c.BaseURL.ResolveReference(rel)
-	u.RawQuery = q
+	u.RawQuery = query
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -88,4 +100,33 @@ func (c *Client) ListSubscriptions(q string) ([]Subscription, error) {
 	var subscriptions []Subscription
 	err = json.NewDecoder(resp.Body).Decode(&subscriptions)
 	return subscriptions, err
+}
+
+// ListProjects returns an array of project objects
+func (c *Client) ListProjects(query string) ([]Project, error) {
+	rel := &url.URL{Path: "/projects"}
+	u := c.BaseURL.ResolveReference(rel)
+	u.RawQuery = query
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	fullAuth := fmt.Sprintf("apiToken %s", c.Token)
+	req.Header.Set("Authorization", fullAuth)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	s := resp.StatusCode
+	if s != http.StatusOK {
+		fmt.Printf("status is %s\n", resp.Status)
+		return nil, fmt.Errorf("Bad status: %s", resp.Status)
+	}
+
+	defer resp.Body.Close()
+	var projects []Project
+	err = json.NewDecoder(resp.Body).Decode(&projects)
+	return projects, err
 }

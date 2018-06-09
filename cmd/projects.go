@@ -22,8 +22,12 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/trriplejay/ship/shippable"
 )
 
 // projectsCmd represents the projects command
@@ -37,7 +41,22 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("projects called")
+		fullName := cmd.Flag("full-name").Value.String()
+		fmt.Printf("projects called with args: %v\n", args)
+		s, err := shippable.NewClient("", os.Getenv("API_TOKEN"))
+		if err != nil {
+			log.Fatal("unable to create shippable client")
+		}
+		var q string
+		if fullName != "" {
+			q += "projectFullNames=" + fullName
+		}
+		fmt.Printf("full name is: %s", q)
+		projs, err := s.ListProjects(q)
+		if err != nil {
+			log.Fatal("bad projects query")
+		}
+		fmt.Printf("got %d items\n", len(projs))
 
 	},
 }
@@ -54,4 +73,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// projectsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	projectsCmd.Flags().String("full-name", "", "org/repo")
+
+	viper.BindPFlag("endpoint", projectsCmd.PersistentFlags().Lookup("endpoint"))
 }
